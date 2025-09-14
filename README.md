@@ -44,7 +44,7 @@ Before installing the WhatsApp Mention All Bot, ensure you have:
 ### Step 1: Clone or Download
 
 ```bash
-git clone https://github.com/WasThatRudy/whatsapp-mention-all.git
+git clone https://github.com/WasThatRudy/mentionall.git
 cd whatsapp-mention-all
 ```
 
