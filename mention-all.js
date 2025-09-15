@@ -1,7 +1,9 @@
-const { Client } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
-const client = new Client();
+const client = new Client({
+  authStrategy: new LocalAuth()
+});
 
 client.on('qr', qr => {
   console.log('[DEBUG] QR code received');
@@ -29,26 +31,26 @@ client.on('message_create', async msg => {
       // Try multiple approaches with timeouts
       
       // Approach 1: msg.getChat() with timeout
-      console.log('[DEBUG] Trying msg.getChat() with 5 second timeout...');
+      console.log('[DEBUG] Trying msg.getChat() with 10 second timeout...');
       let chat;
       try {
         chat = await withTimeout(
           msg.getChat(), 
-          5000, 
-          'msg.getChat() timeout after 5 seconds'
+          10000, 
+          'msg.getChat() timeout after 10 seconds'
         );
         console.log('[DEBUG] msg.getChat() succeeded!');
       } catch (error) {
         console.log('[DEBUG] msg.getChat() failed:', error.message);
         
         // Approach 2: client.getChatById() with timeout
-        console.log('[DEBUG] Trying client.getChatById() with 5 second timeout...');
+        console.log('[DEBUG] Trying client.getChatById() with 10 second timeout...');
         const chatId = msg.to || msg.from;
         try {
           chat = await withTimeout(
             client.getChatById(chatId),
-            5000,
-            'client.getChatById() timeout after 5 seconds'
+            10000,
+            'client.getChatById() timeout after 10 seconds'
           );
           console.log('[DEBUG] client.getChatById() succeeded!');
         } catch (error2) {
@@ -59,7 +61,7 @@ client.on('message_create', async msg => {
           try {
             await withTimeout(
               client.sendMessage(msg.to || msg.from, 'Test message - checking if basic send works'),
-              5000,
+              10000,
               'Direct sendMessage timeout'
             );
             console.log('[DEBUG] Direct message send worked, but chat retrieval is broken');
@@ -77,7 +79,7 @@ client.on('message_create', async msg => {
         console.log('[DEBUG] Not a group chat');
         await withTimeout(
           chat.sendMessage('❌ This command only works in group chats!'),
-          5000,
+          10000,
           'Send error message timeout'
         );
         return;
@@ -95,7 +97,7 @@ client.on('message_create', async msg => {
           console.log('[DEBUG] Getting group metadata...');
           const groupMetadata = await withTimeout(
             client.getGroupMetadata(chat.id._serialized),
-            5000,
+            10000,
             'getGroupMetadata timeout'
           );
           participants = groupMetadata.participants.map(p => p.id._serialized);
